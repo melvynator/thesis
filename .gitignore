@@ -1,5 +1,3 @@
-*~
-
 # Pycharm
 .idea
 
@@ -12,4 +10,7 @@ documents
 
 # Mac Files
 .DS_Store
+*~
 
+# virtual environnement
+venv
