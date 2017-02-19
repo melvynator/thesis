@@ -1,0 +1,15 @@
+*~
+
+# Pycharm
+.idea
+
+# documents
+documents
+
+# Python/notebook
+.ipynb_checkpoints
+*.pyc
+
+# Mac Files
+.DS_Store
+
