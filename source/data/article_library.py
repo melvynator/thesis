@@ -11,7 +11,6 @@ from cassandra.cluster import Cluster
 import plotly.offline as po
 from plotly.graph_objs import *
 import plotly.graph_objs as go
-po.offline.init_notebook_mode()
 
 
 # This class is used when you want to crawl one website, it defined some of the basic fields
@@ -19,9 +18,9 @@ class Article(abc.ABC):
     strategy = "SimpleStrategy"
     replication_factor = 2
     cassandra_keyspace = "article"
-    cluster = Cluster()
+    cluster = Cluster(['192.168.2.33'], port=9042)
     session = cluster.connect()
-    es_host = {"host": "localhost", "port": 9200}
+    es_host = {"host": "192.168.2.33", "port": 9200}
     es = Elasticsearch([es_host])
     es_index = "article"
     index_settings = {
@@ -206,17 +205,17 @@ class DailystormerArticle(Article):
     website_url = "http://www.dailystormer.com/"
     mapping = {
         "properties": {
-            "title": {"type": "text"},
-            "author": {"type": "text"},
-            "url": {"type": "text"},
-            "article": {"type": "text"},
-            "author_wording": {"type": "text"},
+            "title": {"type": "text", "fielddata": True},
+            "author": {"type": "keyword"},
+            "url": {"type": "keyword"},
+            "article": {"type": "text", "fielddata": True},
+            "author_wording": {"type": "text", "fielddata": True},
             "nb_comment": {"type": "integer"},
             "date": {
                 "type": "date",
                 "format": "yyyy-MM-dd"},
-            "sources": {"type": "text"},
-            "links": {"type": "text"},
+            "sources": {"type": "keyword"},
+            "links": {"type": "keyword"},
         }
     }
     document_type = "dailystormer"
@@ -454,16 +453,16 @@ class AmrenArticle(Article):
     website_url = "https://www.amren.com/"
     mapping = {
         "properties": {
-            "title": {"type": "text"},
-            "author": {"type": "text"},
-            "url": {"type": "text"},
-            "article": {"type": "text"},
-            "author_wording": {"type": "text"},
+            "title": {"type": "text", "fielddata": True},
+            "author": {"type": "keyword"},
+            "url": {"type": "keyword"},
+            "article": {"type": "text", "fielddata": True},
+            "author_wording": {"type": "text", "fielddata":True},
             "date": {
                 "type": "date",
                 "format": "yyyy-MM-dd"},
-            "sources": {"type": "text"},
-            "links": {"type": "text"},
+            "sources": {"type": "keyword"},
+            "links": {"type": "keyword"},
         }
     }
     document_type = "amren"

@@ -14,3 +14,6 @@ documents
 
 # virtual environnement
 venv
+
+# settings
+settings.py

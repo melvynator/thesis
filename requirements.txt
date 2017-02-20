@@ -4,3 +4,4 @@ cassandra-driver~=3.7.1
 cqlsh~=5.0.3
 plotly==1.12.12
 numpy==1.11.2
+tweepy==3.5.0
