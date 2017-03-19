@@ -4,11 +4,11 @@ from elasticsearch import helpers
 import tweepy
 from cassandra.concurrent import execute_concurrent_with_args
 
+from source.settings import settings
 
 if __name__ == '__main__' and __package__ is None:
     from os import sys, path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    from source.settings import settings
 
 TWEETS_MAPPING = {
                     "template": "twitter*",
