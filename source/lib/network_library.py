@@ -18,6 +18,24 @@ class SocialGraph:
     network_table = "twitter.network"
 
     @classmethod
+    def build_graph_from_nodes(cls, nodes, name):
+        print("Build graph from a list of nodes")
+        obj = cls(name)
+        for node in nodes:
+            query = "SELECT friend_follower_id, is_friend, is_follower FROM {0} WHERE node_id={1}"\
+                .format(obj.network_table, node)
+            statement = SimpleStatement(query, fetch_size=1000)
+            for friend in obj.session.execute(statement):
+                if friend.friend_follower_id in nodes:
+                    if friend.is_friend:
+                        obj.graph.add_edge(node, friend.friend_follower_id)
+                    if friend.is_follower:
+                        obj.graph.add_edge(friend.friend_follower_id, node)
+        obj.modified_graph = obj.graph
+        obj.diffusers = obj.get_followed_nodes()
+        return obj
+
+    @classmethod
     def build_graph_from_seed(cls, name):
         print("Building graph from seed")
         obj = cls(name=name)
@@ -109,7 +127,7 @@ class SocialGraph:
                 obj.seeds.append(node.node_id)
             obj.graph.add_nodes_from(obj.seeds)
             nodes_dictionnary = {}
-            node_numbers = 0
+            all_nodes = set()
             for seed in obj.seeds:
                 query = "SELECT friend_follower_id, is_follower, is_friend FROM {0} WHERE node_id={1}"\
                     .format(obj.network_table, seed)
@@ -123,10 +141,10 @@ class SocialGraph:
                 nodes_dictionnary[seed] = {}
                 nodes_dictionnary[seed]["friends"] = friends
                 nodes_dictionnary[seed]["followers"] = followers
-                node_numbers += len(friends) + len(followers) + 1  # + 1 for the seed
-            percentage_of_the_graph = float(100.0 * graph_size / node_numbers)
+                all_nodes.add((friends + followers))
+            percentage_of_the_graph = float(100.0 * graph_size / len(all_nodes))
             print("The random graph will have {0}% of the initial graph ({1} nodes)"
-                  .format(percentage_of_the_graph, node_numbers))
+                  .format(percentage_of_the_graph, len(all_nodes)))
             probability_node = percentage_of_the_graph/100
             for seed, neighboors in nodes_dictionnary.items():
                 if "friends" in neighboors:
@@ -296,9 +314,20 @@ def sort_node_by_importance(nodes_dictionnary):
     sorted_nodes = sorted(nodes_dictionnary.items(), key=lambda x: x[1], reverse=True)
     return sorted_nodes
 
-#graph = SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_2000_nodes", graph_size=2000)
-#i = 0
-#for node in graph.graph.nodes():
+# graph = SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_2000_nodes", graph_size=2000)
+# i = 0
+# for node in graph.graph.nodes():
 #    if graph.retrieve_retweet_from_the_friends_of_a_user(node):
 #        i += 1
-#print(i)
+# print(i)
+"""
+graph_2000 = SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_2000_nodes", graph_size=2000)
+nodes_2000 = graph_2000.graph.nodes()
+graph_5000 = SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_5000_nodes", graph_size=5000)
+nodes_5000 = graph_5000.graph.nodes()
+graph_7000 = SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_7000_nodes", graph_size=7000)
+nodes_7000 = graph_7000.graph.nodes()
+nodes_14000 = set(nodes_2000 + nodes_5000 + nodes_7000)
+"""
+graph_14000 = SocialGraph("sub_graph_14000_nodes")
+graph_14000.get_followed_nodes()
