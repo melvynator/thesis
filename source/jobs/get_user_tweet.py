@@ -21,7 +21,7 @@ def get_tweet_from_users_in_a_graph(graph):
         tl.collect_and_save_tweet_from_user(node)
 
 
-sub_graph_3000_nodes = nl.SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_3000_nodes",
-                                                                                            graph_size=3000)
-sub_graph_3000_nodes.export_gml()
-get_tweet_from_users_in_a_graph(sub_graph_3000_nodes)
+sub_graph_6000_nodes = nl.SocialGraph.build_graph_from_extended_seed_with_random_neighboors("sub_graph_6000_nodes",
+                                                                                            graph_size=6000)
+sub_graph_6000_nodes.export_gml()
+get_tweet_from_users_in_a_graph(sub_graph_6000_nodes)

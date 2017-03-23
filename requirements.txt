@@ -10,3 +10,4 @@ redis==2.10.5
 networkx==1.11
 matplotlib==2.0.0
 scipy==0.18.1
+jupyter==1.0.0
