@@ -116,7 +116,7 @@ def save_tweets_in_elasticsearch(tweets, es):
         tweet['_op_type'] = "index"
         tweet['_index'] = "tweets"
         tweet["_type"] = "tweet"
-    helpers.bulk(actions=tweets, client=es, refresh=True)
+    helpers.bulk(actions=tweets, client=es, request_timeout=40)
 
 
 # Access the tweet of a user via Tweepy and Twitter API

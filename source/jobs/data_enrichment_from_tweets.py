@@ -117,14 +117,19 @@ def save_user_info(data):
 
 def get_and_save_info(twitter_id):
     source_fields = ["user", "retweet", "entities"]
-    for field in source_fields:
-        query = build_query(twitter_id, field)
-        result = retrieve_document_given_a_body(query)
-        if result:
-            info = extract(result, twitter_id, field)
-            save_user_info(info)
-            return True
-    print("No information found for: {0}".format(twitter_id))
+    prepared = SESSION.prepare('SELECT screen_name FROM {0} WHERE node_id=?'.format(TABLE_NAME))
+    row = SESSION.execute(prepared, [twitter_id])
+    if not row:
+        for field in source_fields:
+            query = build_query(twitter_id, field)
+            result = retrieve_document_given_a_body(query)
+            if result:
+                info = extract(result, twitter_id, field)
+                save_user_info(info)
+                return True
+        print("No information found for: {0}".format(twitter_id))
+    else:
+        print("{0}, already saved".format(twitter_id))
 
 
 def main():

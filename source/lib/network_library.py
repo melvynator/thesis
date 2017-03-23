@@ -5,6 +5,8 @@ from elasticsearch import Elasticsearch
 import random
 import pickle
 import os.path
+import numpy
+import plotly.graph_objs as go
 
 from source.__init__ import DEFINITIONS_ROOT
 
@@ -141,7 +143,7 @@ class SocialGraph:
                 nodes_dictionnary[seed] = {}
                 nodes_dictionnary[seed]["friends"] = friends
                 nodes_dictionnary[seed]["followers"] = followers
-                all_nodes.add((friends + followers))
+                all_nodes.update(set(friends + followers))
             percentage_of_the_graph = float(100.0 * graph_size / len(all_nodes))
             print("The random graph will have {0}% of the initial graph ({1} nodes)"
                   .format(percentage_of_the_graph, len(all_nodes)))
@@ -263,6 +265,14 @@ class SocialGraph:
         else:
             return False
 
+    # Return the average of followers in the graph
+    def get_average_number_of_followers(self):
+        return numpy.mean([self.graph.in_degree(node) for node in self.graph.nodes()])
+
+    # Return the average number of friends in the graph
+    def get_average_number_of_friends(self):
+        return numpy.mean([self.graph.out_degree(node) for node in self.graph.nodes()])
+
     def get_nodes_by_betweenness_centrality(self, nb_node, normalized=True):
         print("Trying to load the betweenness centrality from file...")
         file_path = DEFINITIONS_ROOT+"/data/graph/{0}/{1}_betweenness_centrality.p".format(self.name, str(nb_node))
@@ -276,6 +286,29 @@ class SocialGraph:
         else:
             print("Load betweenness centrality from file")
         return betweenness_centrality
+
+    """
+    Graph visualization functions
+    """
+
+    def get_friends_followers_distribution_figure(self):
+        user_degree = {node: self.graph.degree(node) for node in self.graph.nodes()}
+        likely_seed = sort_node_by_importance(user_degree)[:200]
+        trace1 = go.Histogram(
+            x=[self.graph.out_degree(node[0]) for node in likely_seed],
+            opacity=0.75,
+            name="Friends"
+        )
+        trace2 = go.Histogram(
+            x=[self.graph.in_degree(node[0]) for node in likely_seed],
+            opacity=0.75,
+            name="Followers"
+        )
+
+        data = [trace1, trace2]
+        layout = go.Layout(barmode='overlay', title="Friends and followers distribution")
+        fig = go.Figure(data=data, layout=layout)
+        return fig
 
     def __init__(self, name):
         loaded_graph = self.get_graph_from_gml(name)
@@ -329,5 +362,3 @@ graph_7000 = SocialGraph.build_graph_from_extended_seed_with_random_neighboors("
 nodes_7000 = graph_7000.graph.nodes()
 nodes_14000 = set(nodes_2000 + nodes_5000 + nodes_7000)
 """
-graph_14000 = SocialGraph("sub_graph_14000_nodes")
-graph_14000.get_followed_nodes()
