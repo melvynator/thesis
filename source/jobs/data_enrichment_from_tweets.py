@@ -127,15 +127,18 @@ def get_and_save_info(twitter_id):
                 info = extract(result, twitter_id, field)
                 save_user_info(info)
                 return True
-        print("No information found for: {0}".format(twitter_id))
-    else:
-        print("{0}, already saved".format(twitter_id))
 
 
 def main():
     create_new_cassandra_table(TABLE_NAME)
     ids = get_all_ids()
+    nb_users = len(ids)
+    one_percent = int(nb_users / 100)
+    nb_user_process = 0
     for twitter_id in ids:
+        if nb_user_process % one_percent == 0:
+            print("Progress: {0} %".format(nb_user_process*100/nb_users))
+        nb_user_process += 1
         get_and_save_info(twitter_id)
 
 

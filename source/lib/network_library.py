@@ -147,7 +147,8 @@ class SocialGraph:
             percentage_of_the_graph = float(100.0 * graph_size / len(all_nodes))
             print("The random graph will have {0}% of the initial graph ({1} nodes)"
                   .format(percentage_of_the_graph, len(all_nodes)))
-            probability_node = percentage_of_the_graph/100
+            probability_node = percentage_of_the_graph/200
+            print(probability_node)
             for seed, neighboors in nodes_dictionnary.items():
                 if "friends" in neighboors:
                     seed_links = [seed for seed in obj.seeds if seed in neighboors["friends"]]
@@ -261,6 +262,7 @@ class SocialGraph:
         if os.path.exists(directory_path):
             print("Load graph from file: {0}".format(directory_path))
             loaded_graph = nx.read_gml(directory_path)
+            print("The graph got {0} nodes and {1} edges".format(len(loaded_graph.nodes()), len(loaded_graph.edges())))
             return loaded_graph
         else:
             return False
